@@ -30,15 +30,16 @@ Before proposing or modifying code, consult the primary design documents:
 
 ## 3. Core Architectural Invariants
 
-### Invariant 1: Pure Core Domain (`internal/core/domain/`)
-* **ZERO external dependencies**: The core domain must contain standard-library Go only.
-* Never import framework code, database drivers, WhatsApp libraries (`whatsmeow`), or AI SDKs inside `internal/core/domain`.
+### Invariant 1: Pure Feature Domains (`internal/{user,learning,touchpoint}/domain/`)
+* **ZERO external dependencies**: The domain models must contain standard-library Go only.
+* Never import framework code, database drivers, WhatsApp libraries (`whatsmeow`), or AI SDKs inside feature domain packages.
 * Business rules, aggregates ([`User`](file:///Users/alejandrogarciaserna/Documents/github/whatsapp-assistant/docs/domain-model.md#L132), [`LearningPath`](file:///Users/alejandrogarciaserna/Documents/github/whatsapp-assistant/docs/domain-model.md#L141), [`MasteryLedger`](file:///Users/alejandrogarciaserna/Documents/github/whatsapp-assistant/docs/domain-model.md#L150), [`TouchpointSession`](file:///Users/alejandrogarciaserna/Documents/github/whatsapp-assistant/docs/domain-model.md#L158)), and state transitions live here.
+* **Aggregate Decoupling**: Aggregates reference each other strictly by **Identity (`UserID`, `PathID`)** defined in `internal/shared/`, never by direct struct pointers, preventing Go cyclic imports.
 
-### Invariant 2: Explicit Ports (`internal/core/ports/`)
-* Communication between the domain and outside infrastructure occurs strictly across interfaces defined in `ports`.
+### Invariant 2: Explicit Ports
+* Communication between domain features and infrastructure occurs strictly across Go interface contracts in each feature's `ports.go`.
 * **Driving Adapters** (cron daemon, whatsmeow listener) call inbound ports.
-* **Driven Adapters** (`adapters/storage`, `adapters/llm`, `adapters/whatsapp`) implement outbound ports (`LLMPort`, `MessagingPort`, `RepositoryPort`).
+* **Driven Adapters** (`adapters/storage`, `adapters/llm`, `adapters/whatsapp`) implement outbound ports (`LLMPort`, `MessagingPort`, repositories).
 
 ### Invariant 3: Strict Multi-Tenancy Boundary
 * Every table, vector index, and domain aggregate is strictly scoped to `user_id`.
@@ -50,16 +51,23 @@ Before proposing or modifying code, consult the primary design documents:
 
 ---
 
-## 4. Directory Structure (Screaming Architecture)
+## 4. Directory Structure (Screaming Architecture & Package by Feature)
 
 ```
 cmd/
-  daemon/                  # Main daemon: boots config, SQLite, adapters, domain wiring
+  daemon/                  # Main daemon: boots config, SQLite, adapters, wires features
 internal/
-  core/
-    domain/                # Pure Go domain entities, aggregates, business invariants
-    ports/                 # Inbound and outbound interface definitions
-    services/              # Use-case orchestrators (arbitrator, drill runner, coach)
+  shared/                  # Shared Kernel: value types, domain IDs (UserID, PathID, SessionID)
+  user/                    # Identity & Circadian Baselines
+    domain/                # User aggregate root, daily 2-touch budget, circadian baselines
+    ports.go               # UserRepository interface
+  learning/                # Curriculum & Knowledge Context
+    domain/                # LearningPath & MasteryLedger aggregates, spaced repetition state
+    ports.go               # LearningPathRepository, MasteryLedgerRepository, SourceCorpusPort
+  touchpoint/              # Adaptive Proactive Drills
+    domain/                # TouchpointSession aggregate, session state machine, backoff rules
+    ports.go               # TouchpointRepository, MessagingPort, LLMPort, CalendarTelemetryPort
+    services/              # Arbitrator ("The ONE Thing"), DrillRunner, ProgressCoach
   adapters/
     whatsapp/              # whatsmeow client adapter
     gdrive/                # Google Drive corpus ingestor
@@ -72,6 +80,6 @@ internal/
 
 ## 5. Working Rules for Coding Agents
 
-1. **Test-First (TDD)**: Write failing domain unit tests before implementing business logic in `internal/core/domain`.
+1. **Test-First (TDD)**: Write failing domain unit tests before implementing business logic in feature domain packages.
 2. **No Leaky Abstractions**: Keep storage queries, SQL strings, and API payloads isolated inside `internal/adapters`.
 3. **Respect Bounded Contexts**: A `LearningPath` is an isolated context bag. Do not bleed one path's mastery state into another during cross-domain queries.
