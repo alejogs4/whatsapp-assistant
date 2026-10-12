@@ -40,10 +40,11 @@ The core objective of Issue #1 is establishing the pure business domain foundati
 | **Memory Footprint** | Bloated (eager/lazy graph loading) | Minimal (single aggregate boundary) |
 | **Multi-Tenancy** | Implicit | Explicit compiler-enforced partition keys |
 
-### Decision 3: Standard Library Only for Domain Aggregates vs External Libraries
-- **Choice**: Pure Go standard library (`time`, `math`, `errors`, `context`).
-- **Alternatives Considered**: Third-party UUID libraries (`google/uuid`), ORMs (GORM), validation frameworks (`validator`), state machine libraries.
-- **Rationale**: Fulfills Invariant 1 from `AGENTS.md`. Eliminates vendor lock-in and supply-chain vulnerabilities, guarantees instant compilation, and preserves clean hexagonal boundaries where domain entities remain 100% agnostic to drivers.
+### Decision 3: Standard Library Constraint Scoped to Domain Packages vs Project-Wide
+- **Choice**: Pure Go standard library (`time`, `math`, `errors`, `context`) enforced strictly within `internal/*/domain/`.
+- **Infrastructure Scope**: External libraries (ORMs like GORM or sqlc, UUID generators like `google/uuid`, validators, external drivers) are **fully permitted in `internal/adapters/`** (e.g. SQLite storage, WhatsApp transport, LLM clients).
+- **Rationale**: Fulfills Invariant 1 from `AGENTS.md`. Preserves clean Hexagonal boundaries by preventing database schemas or third-party SDKs from dictating business invariants, while leaving persistence adapters completely free to leverage whatever ORM, SQL mapper, or utility libraries make implementation efficient.
+
 
 ### Decision 4: Deterministic Time & Timezone Injection vs `time.Now()` Calls
 - **Choice**: Explicit `now time.Time` parameter injection for domain methods mutating or validating temporal invariants, coupled with IANA timezone evaluation via `time.LoadLocation`.
