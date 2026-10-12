@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp AI Assistant — 1-Minute Explainer Video</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --player-bg: #030712;
+      --accent: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .header-bar {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      max-width: 960px;
+      width: 100%;
+    }
+    .header-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Video Frame */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      background: var(--player-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border);
+    }
+
+    canvas#videoCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Overlay Controls */
+    .controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 1.25rem;
+      background: linear-gradient(to top, rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.4), transparent);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+      border-radius: 4px;
+      position: relative;
+    }
+    .progress-scrubber {
+      position: absolute;
+      right: -6px;
+      top: -3px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .left-controls, .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .btn {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #030712;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+    }
+    .btn-primary:hover {
+      background: #7dd3fc;
+    }
+    .time-display {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Subtitles overlay */
+    .subtitles-box {
+      position: absolute;
+      bottom: 4.5rem;
+      left: 5%;
+      right: 5%;
+      text-align: center;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .subtitles-text {
+      display: inline-block;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+      line-height: 1.4;
+      max-width: 80%;
+    }
+
+    /* Big Center Play Button Overlay */
+    .center-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 7, 18, 0.4);
+      cursor: pointer;
+      z-index: 8;
+      transition: opacity 0.2s;
+    }
+    .center-play-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #030712;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .center-play-overlay:hover .center-play-btn {
+      transform: scale(1.08);
+      background: #fff;
+    }
+    .center-play-overlay.hidden {
+      display: none;
+    }
+
+    /* Chapter Pills below video */
+    .chapters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      max-width: 960px;
+      width: 100%;
+    }
+    .chapter-pill {
+      background: #111827;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chapter-pill:hover, .chapter-pill.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div class="header-badge">Product Showcase • 60-Second Video</div>
+    <h1>WhatsApp AI Assistant: How It Works</h1>
+    <p class="subtitle">An adaptive AI learning coach that eliminates cognitive friction through a disciplined two-touch WhatsApp loop.</p>
+  </div>
+
+  <div class="video-wrapper">
+    <canvas id="videoCanvas" width="1280" height="720"></canvas>
+    
+    <div class="subtitles-box">
+      <div id="subtitlesText" class="subtitles-text">Click Play to begin the 1-minute walkthrough</div>
+    </div>
+
+    <div id="centerPlayOverlay" class="center-play-overlay">
+      <div class="center-play-btn">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="progress-bar-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-scrubber"></div>
+        </div>
+      </div>
+      
+      <div class="control-buttons">
+        <div class="left-controls">
+          <button class="btn" id="playBtn" title="Play/Pause">
+            <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+          <button class="btn" id="restartBtn" title="Restart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+          </button>
+          <div class="time-display" id="timeDisplay">0:00 / 0:55</div>
+        </div>
+
+        <div class="right-controls">
+          <button class="btn" id="recordBtn" title="Export WebM Video" style="font-size: 0.8rem; gap: 0.4rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="red">
+              <circle cx="12" cy="12" r="8"></circle>
+            </svg>
+            <span id="recordBtnText">Export Video</span>
+          </button>
+          <button class="btn" id="fullscreenBtn" title="Toggle Fullscreen">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapters">
+    <div class="chapter-pill active" onclick="seekTo(0)">0:00 Problem: Cognitive Fatigue</div>
+    <div class="chapter-pill" onclick="seekTo(11)">0:11 Adaptive Energy Engine</div>
+    <div class="chapter-pill" onclick="seekTo(21)">0:21 8:00 AM The ONE Thing</div>
+    <div class="chapter-pill" onclick="seekTo(34)">0:34 8:00 PM Streak Saver</div>
+    <div class="chapter-pill" onclick="seekTo(43)">0:43 Grounded Learning Paths</div>
+    <div class="chapter-pill" onclick="seekTo(50)">0:50 Macro Career Mentorship</div>
+  </div>
+
+  <!-- Audio Element -->
+  <audio id="narrationAudio" preload="auto">
+    <source src="narration.m4a" type="audio/mp4">
+    <source src="narration.wav" type="audio/wav">
+  </audio>
+
+  <script>
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('narrationAudio');
+    const playBtn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const restartBtn = document.getElementById('restartBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const subtitlesText = document.getElementById('subtitlesText');
+    const centerPlayOverlay = document.getElementById('centerPlayOverlay');
+    const recordBtn = document.getElementById('recordBtn');
+    const recordBtnText = document.getElementById('recordBtnText');
+
+    const TOTAL_DURATION = 55.0; // Seconds
+    let currentTime = 0;
+    let isPlaying = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // Subtitle timeline script
+    const subtitles = [
+      { start: 0.0, end: 5.5, text: "Most learning apps fail because they assume you have infinite mental energy." },
+      { start: 5.5, end: 11.0, text: "At 8:00 PM, your brain is fried, you ignore notifications, feel guilty, and quit." },
+      { start: 11.0, end: 15.5, text: "Meet your WhatsApp Adaptive Learning Coach." },
+      { start: 15.5, end: 21.0, text: "Instead of an annoying chatbot, it enforces a strict two-touch daily loop." },
+      { start: 21.0, end: 27.5, text: "At 8:00 AM, it eliminates decision fatigue by declaring The ONE Thing to study today..." },
+      { start: 27.5, end: 34.0, text: "...serving a two-minute micro-drill right inside WhatsApp with zero activation energy." },
+      { start: 34.0, end: 39.0, text: "It matches study friction to your cognitive energy: deep practice when fresh..." },
+      { start: 39.0, end: 43.5, text: "...zero-friction active recall flashcards when you are drained." },
+      { start: 43.5, end: 49.5, text: "At night, if work was brutal, a 15-second recall card keeps your streak alive." },
+      { start: 49.5, end: 54.5, text: "Grounded in your own books with local vectors, acting as your mentor from RDD to Patterns." },
+      { start: 54.5, end: 60.0, text: "Zero friction. Real momentum." }
+    ];
+
+    function formatTime(s) {
+      const mins = Math.floor(s / 60);
+      const secs = Math.floor(s % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Play / Pause Logic
+    function togglePlay() {
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        centerPlayOverlay.classList.remove('hidden');
+        playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      } else {
+        audio.play().then(() => {
+          isPlaying = true;
+          centerPlayOverlay.classList.add('hidden');
+          playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        }).catch(() => {
+          // Fallback if audio fails to autoplay
+          isPlaying = true;
+          centerPlayOverlay.classList.add('hidden');
+          playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        });
+      }
+    }
+
+    function seekTo(seconds) {
+      currentTime = seconds;
+      audio.currentTime = seconds;
+      if (!isPlaying) togglePlay();
+    }
+
+    centerPlayOverlay.addEventListener('click', togglePlay);
+    playBtn.addEventListener('click', togglePlay);
+
+    restartBtn.addEventListener('click', () => {
+      audio.currentTime = 0;
+      currentTime = 0;
+      if (!isPlaying) togglePlay();
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      seekTo(pos * TOTAL_DURATION);
+    });
+
+    // Recording functionality
+    recordBtn.addEventListener('click', () => {
+      if (isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        recordBtnText.innerText = "Export Video";
+      } else {
+        startRecording();
+      }
+    });
+
+    function startRecording() {
+      const stream = canvas.captureStream(30);
+      try {
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaElementSource(audio);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+        const combined = new MediaStream([...stream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
+        mediaRecorder = new MediaRecorder(combined, { mimeType: 'video/webm' });
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      }
+
+      recordedChunks = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'whatsapp-assistant-overview.webm';
+        a.click();
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      recordBtnText.innerText = "Recording...";
+      audio.currentTime = 0;
+      currentTime = 0;
+      if (!isPlaying) togglePlay();
+    }
+
+    // Audio time sync
+    audio.addEventListener('timeupdate', () => {
+      currentTime = audio.currentTime;
+    });
+
+    audio.addEventListener('ended', () => {
+      isPlaying = false;
+      centerPlayOverlay.classList.remove('hidden');
+      playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      if (isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        recordBtnText.innerText = "Export Video";
+      }
+    });
+
+    // Drawing Scenes on Canvas (1280 x 720)
+    function render(time) {
+      ctx.clearRect(0, 0, 1280, 720);
+
+      // Background Gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 1280, 720);
+      bgGrad.addColorStop(0, '#030712');
+      bgGrad.addColorStop(0.5, '#0b1329');
+      bgGrad.addColorStop(1, '#020617');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Subtle Tech Grid Lines
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.04)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 1280; x += 60) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 720); ctx.stroke();
+      }
+      for (let y = 0; y < 720; y += 60) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1280, y); ctx.stroke();
+      }
+
+      // Draw Top Brand Bar
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '600 16px -apple-system, sans-serif';
+      ctx.fillText('WHATSAPP AI ASSISTANT • ARCHITECTURAL OVERVIEW', 60, 50);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath(); ctx.arc(45, 45, 5, 0, Math.PI * 2); ctx.fill();
+
+      // SCENE LOGIC
+      if (time < 11.0) {
+        drawScene1_TheProblem(time);
+      } else if (time < 21.0) {
+        drawScene2_TheSolution(time - 11.0);
+      } else if (time < 34.0) {
+        drawScene3_MorningKickoff(time - 21.0);
+      } else if (time < 43.5) {
+        drawScene4_AdaptiveEnergy(time - 34.0);
+      } else if (time < 50.0) {
+        drawScene5_BoundedContexts(time - 43.5);
+      } else {
+        drawScene6_MacroMentorship(time - 50.0);
+      }
+
+      // Update Subtitles & Progress
+      updateSubtitles(time);
+      const progressPct = Math.min((time / TOTAL_DURATION) * 100, 100);
+      progressBar.style.width = `${progressPct}%`;
+      timeDisplay.innerText = `${formatTime(time)} / ${formatTime(TOTAL_DURATION)}`;
+
+      // Update chapter pills
+      const pills = document.querySelectorAll('.chapter-pill');
+      pills.forEach((p, idx) => {
+        p.classList.remove('active');
+      });
+      if (time < 11) pills[0].classList.add('active');
+      else if (time < 21) pills[1].classList.add('active');
+      else if (time < 34) pills[2].classList.add('active');
+      else if (time < 43.5) pills[3].classList.add('active');
+      else if (time < 50) pills[4].classList.add('active');
+      else pills[5].classList.add('active');
+    }
+
+    function updateSubtitles(t) {
+      const match = subtitles.find(s => t >= s.start && t < s.end);
+      if (match) {
+        subtitlesText.innerText = match.text;
+      }
+    }
+
+    // SCENE 1: The Problem (Cognitive Fatigue & High Friction)
+    function drawScene1_TheProblem(t) {
+      ctx.save();
+      // Title
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('THE REAL ENEMY: ACTIVATION INERTIA', 100, 130);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 42px -apple-system, sans-serif';
+      ctx.fillText('Time is Not the Bottleneck.', 100, 185);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '400 24px -apple-system, sans-serif';
+      ctx.fillText('Cognitive fatigue kills habit momentum at 8:00 PM.', 100, 225);
+
+      // Card 1: Traditional Apps Fail
+      const cardX = 100, cardY = 270, cardW = 500, cardH = 340;
+      ctx.fillStyle = '#111827';
+      ctx.strokeStyle = '#374151';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 12, true, true);
+
+      ctx.fillStyle = '#f87171';
+      ctx.font = '700 18px -apple-system, sans-serif';
+      ctx.fillText('❌ Traditional Learning Apps', cardX + 30, cardY + 50);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '400 17px -apple-system, sans-serif';
+      ctx.fillText('• Assumes 100% mental bandwidth at all hours', cardX + 30, cardY + 100);
+      ctx.fillText('• Dumps 45-minute lectures or dense chapters', cardX + 30, cardY + 145);
+      ctx.fillText('• Triggers GUILT and avoidance when ignored', cardX + 30, cardY + 190);
+      ctx.fillText('• Result: You mute the app within 48 hours', cardX + 30, cardY + 235);
+
+      // Warning alert box
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+      ctx.strokeStyle = '#ef4444';
+      roundRect(ctx, cardX + 30, cardY + 265, cardW - 60, 50, 8, true, true);
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '600 15px -apple-system, sans-serif';
+      ctx.fillText('Fatigue + Friction = Abandoned Habit', cardX + 60, cardY + 296);
+
+      // Visual: Animated Battery Level
+      const batX = 720, batY = 320;
+      ctx.fillStyle = '#1e293b';
+      roundRect(ctx, batX, batY, 400, 200, 16, true, false);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 16px -apple-system, sans-serif';
+      ctx.fillText('MENTAL ENERGY AT 8:00 PM', batX + 30, batY + 45);
+
+      // Battery Outline
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 3;
+      roundRect(ctx, batX + 30, batY + 70, 260, 70, 8, false, true);
+      ctx.fillRect(batX + 295, batY + 90, 10, 30); // Battery tip
+
+      // Draining energy pulse
+      const fillW = Math.max(30, 240 * (1 - Math.min(t / 8, 0.85)));
+      ctx.fillStyle = fillW < 80 ? '#ef4444' : '#f59e0b';
+      roundRect(ctx, batX + 36, batY + 76, fillW, 58, 4, true, false);
+
+      ctx.fillStyle = '#f87171';
+      ctx.font = '700 22px -apple-system, sans-serif';
+      ctx.fillText('15% Left', batX + 320, batY + 112);
+      ctx.restore();
+    }
+
+    // SCENE 2: The Solution (Adaptive Energy Coach)
+    function drawScene2_TheSolution(t) {
+      ctx.save();
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('THE PARADIGM SHIFT', 100, 130);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 42px -apple-system, sans-serif';
+      ctx.fillText('An Adaptive Energy Coach on WhatsApp', 100, 185);
+
+      // 2 Golden Pillars
+      const p1X = 100, p1Y = 250, pW = 500, pH = 360;
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, p1X, p1Y, pW, pH, 12, true, true);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 22px -apple-system, sans-serif';
+      ctx.fillText('⚡ 1. Adaptive Modality Spectrum', p1X + 30, p1Y + 50);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillText('Matches study friction directly to mental capacity:', p1X + 30, p1Y + 90);
+
+      // High energy box
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.12)';
+      ctx.strokeStyle = '#22c55e';
+      roundRect(ctx, p1X + 30, p1Y + 120, pW - 60, 75, 8, true, true);
+      ctx.fillStyle = '#4ade80';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText('HIGH ENERGY (Morning / Focus)', p1X + 45, p1Y + 148);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '400 14px -apple-system, sans-serif';
+      ctx.fillText('Deep practice, exercises, rigorous book reading', p1X + 45, p1Y + 175);
+
+      // Low energy box
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.12)';
+      ctx.strokeStyle = '#f59e0b';
+      roundRect(ctx, p1X + 30, p1Y + 220, pW - 60, 75, 8, true, true);
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText('LOW ENERGY (Evening / Fatigue)', p1X + 45, p1Y + 248);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '400 14px -apple-system, sans-serif';
+      ctx.fillText('Active recall cards, 15s in-chat drills, flashcards', p1X + 45, p1Y + 275);
+
+      // Pillar 2: 2-Touch Budget
+      const p2X = 660, p2Y = 250;
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#a855f7';
+      roundRect(ctx, p2X, p2Y, pW, pH, 12, true, true);
+
+      ctx.fillStyle = '#a855f7';
+      ctx.font = '700 22px -apple-system, sans-serif';
+      ctx.fillText('🛡️ 2. Strict 2-Touch Notification Budget', p2X + 30, p2Y + 50);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillText('• Maximum 2 unsolicited WhatsApp touches per day', p2X + 30, p2Y + 100);
+      ctx.fillText('• Touchpoint 1: 8:00 AM Morning Catalyst', p2X + 30, p2Y + 140);
+      ctx.fillText('• Touchpoint 2: 8:00 PM Evening Streak Saver', p2X + 30, p2Y + 180);
+      ctx.fillText('• Zero-Nag Backoff: Left on read = silent backoff', p2X + 30, p2Y + 220);
+
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.15)';
+      ctx.strokeStyle = '#a855f7';
+      roundRect(ctx, p2X + 30, p2Y + 265, pW - 60, 60, 8, true, true);
+      ctx.fillStyle = '#e9d5ff';
+      ctx.font = '600 15px -apple-system, sans-serif';
+      ctx.fillText('No Spam • No Guilt • Respects WhatsApp Sacredness', p2X + 50, p2Y + 302);
+
+      ctx.restore();
+    }
+
+    // SCENE 3: 8:00 AM Morning Catalyst (WhatsApp Simulation)
+    function drawScene3_MorningKickoff(t) {
+      ctx.save();
+      ctx.fillStyle = '#22c55e';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('TOUCHPOINT 1 • 8:00 AM', 80, 110);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 38px -apple-system, sans-serif';
+      ctx.fillText('Zero Decision Fatigue: The ONE Thing', 80, 160);
+
+      // WhatsApp Phone Mockup
+      const phX = 680, phY = 90, phW = 480, phH = 580;
+      ctx.fillStyle = '#0b141a';
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 2;
+      roundRect(ctx, phX, phY, phW, phH, 24, true, true);
+
+      // Header Bar (WhatsApp)
+      ctx.fillStyle = '#202c33';
+      roundRect(ctx, phX, phY, phW, 65, [24, 24, 0, 0], true, false);
+
+      // Avatar
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath(); ctx.arc(phX + 45, phY + 33, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText('AI Coach', phX + 75, phY + 32);
+      ctx.fillStyle = '#8696a0';
+      ctx.font = '400 13px -apple-system, sans-serif';
+      ctx.fillText('Online • Ready', phX + 75, phY + 48);
+
+      // Message Bubble 1 (Coach)
+      const b1Y = phY + 95;
+      ctx.fillStyle = '#202c33';
+      roundRect(ctx, phX + 25, b1Y, 410, 175, 12, true, false);
+
+      ctx.fillStyle = '#25d366';
+      ctx.font = '700 14px -apple-system, sans-serif';
+      ctx.fillText('📚 RDD: Responsibility-Driven Design', phX + 45, b1Y + 30);
+
+      ctx.fillStyle = '#e9edef';
+      ctx.font = '400 14px -apple-system, sans-serif';
+      ctx.fillText('Good morning Alejandro! Today\'s focus:', phX + 45, b1Y + 60);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '600 14px -apple-system, sans-serif';
+      ctx.fillText('🎯 The ONE Thing: Stereotype Roles in RDD', phX + 45, b1Y + 85);
+
+      ctx.fillStyle = '#d1d5db';
+      ctx.font = '400 13px -apple-system, sans-serif';
+      ctx.fillText('2-Minute Drill: In Wirfs-Brock\'s model, what is', phX + 45, b1Y + 115);
+      ctx.fillText('the primary duty of an Information Holder?', phX + 45, b1Y + 135);
+
+      ctx.fillStyle = '#8696a0';
+      ctx.font = '400 11px -apple-system, sans-serif';
+      ctx.fillText('08:01 AM ✓✓', phX + 360, b1Y + 160);
+
+      // Message Bubble 2 (User reply if t > 4)
+      if (t > 4) {
+        const b2Y = b1Y + 200;
+        ctx.fillStyle = '#005c4b';
+        roundRect(ctx, phX + 100, b2Y, 340, 80, 12, true, false);
+
+        ctx.fillStyle = '#e9edef';
+        ctx.font = '400 14px -apple-system, sans-serif';
+        ctx.fillText('It holds knowledge, serves attributes,', phX + 120, b2Y + 30);
+        ctx.fillText('and protects encapsulation of state.', phX + 120, b2Y + 52);
+
+        ctx.fillStyle = '#8696a0';
+        ctx.font = '400 11px -apple-system, sans-serif';
+        ctx.fillText('08:03 AM ✓✓', phX + 375, b2Y + 70);
+      }
+
+      // Left explainer cards
+      const lx = 80, ly = 210, lw = 520;
+      ctx.fillStyle = '#111827';
+      roundRect(ctx, lx, ly, lw, 380, 12, true, false);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '600 18px -apple-system, sans-serif';
+      ctx.fillText('How the Morning Touchpoint Works:', lx + 30, ly + 45);
+
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('1. Scheduler fires at user circadian peak (8:00 AM)', lx + 30, ly + 90);
+      ctx.fillText('2. Attention Arbitrator selects the single highest-leverage path', lx + 30, ly + 140);
+      ctx.fillText('3. Context is retrieved from local SQLite vectors (RDD book)', lx + 30, ly + 190);
+      ctx.fillText('4. LLM crafts a bite-sized drill (< 2 minutes to complete)', lx + 30, ly + 240);
+      ctx.fillText('5. Zero choice paradox: Wake up with clear purpose', lx + 30, ly + 290);
+
+      ctx.fillStyle = '#22c55e';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText('Outcome: The activation barrier drops to zero.', lx + 30, ly + 340);
+
+      ctx.restore();
+    }
+
+    // SCENE 4: 8:00 PM Evening Touchpoint (Streak Preservation)
+    function drawScene4_AdaptiveEnergy(t) {
+      ctx.save();
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('TOUCHPOINT 2 • 8:00 PM', 80, 110);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 38px -apple-system, sans-serif';
+      ctx.fillText('Evening Check-In & Streak Preservation', 80, 160);
+
+      // Comparison Diagram
+      const cx1 = 80, cy = 220, cw = 500, ch = 380;
+      
+      // Scenario A: Bureaucratic Manager (Bad)
+      ctx.fillStyle = '#1e1b18';
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1;
+      roundRect(ctx, cx1, cy, cw, ch, 12, true, true);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '700 20px -apple-system, sans-serif';
+      ctx.fillText('❌ The Bureaucratic Interrogation', cx1 + 30, cy + 45);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillText('Bot: "What did you study today? Please log your hours."', cx1 + 30, cy + 95);
+      ctx.fillText('• You had an exhausting 9-hour workday', cx1 + 30, cy + 145);
+      ctx.fillText('• Triggers defensive guilt and dread', cx1 + 30, cy + 190);
+      ctx.fillText('• You leave it on read and mute the bot', cx1 + 30, cy + 235);
+      
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '600 16px -apple-system, sans-serif';
+      ctx.fillText('Result: Habit chain broken.', cx1 + 30, cy + 300);
+
+      // Scenario B: True Coach (Good)
+      const cx2 = 640;
+      ctx.fillStyle = '#13231b';
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, cx2, cy, cw, ch, 12, true, true);
+
+      ctx.fillStyle = '#22c55e';
+      ctx.font = '700 20px -apple-system, sans-serif';
+      ctx.fillText('✅ The Adaptive Recovery Coach', cx2 + 30, cy + 45);
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillText('Coach: "Rough day at work? No problem."', cx2 + 30, cy + 95);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('"Answer this 15-second flashcard to keep your streak:"', cx2 + 30, cy + 130);
+
+      // In-chat micro-card
+      ctx.fillStyle = '#064e3b';
+      roundRect(ctx, cx2 + 30, cy + 160, cw - 60, 100, 8, true, false);
+      ctx.fillStyle = '#a7f3d0';
+      ctx.font = '600 15px -apple-system, sans-serif';
+      ctx.fillText('Q: Does an Information Holder perform business logic?', cx2 + 45, cy + 195);
+      ctx.fillStyle = '#6ee7b7';
+      ctx.font = '400 14px -apple-system, sans-serif';
+      ctx.fillText('Reply with 1 word: YES or NO', cx2 + 45, cy + 225);
+
+      ctx.fillStyle = '#4ade80';
+      ctx.font = '700 16px -apple-system, sans-serif';
+      ctx.fillText('Result: Momentum stays ALIVE with zero pain.', cx2 + 30, cy + 310);
+
+      ctx.restore();
+    }
+
+    // SCENE 5: Grounded Learning Paths & Context Bags
+    function drawScene5_BoundedContexts(t) {
+      ctx.save();
+      ctx.fillStyle = '#a855f7';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('ARCHITECTURAL CORE', 80, 110);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 38px -apple-system, sans-serif';
+      ctx.fillText('Learning Paths as Bounded Context Bags', 80, 160);
+
+      // 3 Isolated Bags
+      const bags = [
+        { title: 'Path 1: Software Design (RDD)', color: '#38bdf8', icon: '📐', x: 80 },
+        { title: 'Path 2: Algorithms & Data Structures', color: '#22c55e', icon: '⚡', x: 460 },
+        { title: 'Path 3: AI & Neural Networks', color: '#f59e0b', icon: '🧠', x: 840 }
+      ];
+
+      bags.forEach(b => {
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, b.x, 220, 360, 370, 14, true, true);
+
+        ctx.fillStyle = b.color;
+        ctx.font = '700 18px -apple-system, sans-serif';
+        ctx.fillText(`${b.icon} ${b.title}`, b.x + 20, 260);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '600 14px -apple-system, sans-serif';
+        ctx.fillText('📦 Encapsulated Invariants:', b.x + 20, 305);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '400 14px -apple-system, sans-serif';
+        ctx.fillText('• Grounded Corpus (Drive PDFs)', b.x + 20, 340);
+        ctx.fillText('• Embedded Vectors (SQLite)', b.x + 20, 375);
+        ctx.fillText('• Topic Mastery Ledger', b.x + 20, 410);
+        ctx.fillText('• Spaced Repetition Schedule', b.x + 20, 445);
+        ctx.fillText('• Pedagogical Skill Strategy', b.x + 20, 480);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        roundRect(ctx, b.x + 20, 510, 320, 50, 8, true, false);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '600 13px -apple-system, sans-serif';
+        ctx.fillText('Scatter-Gather Federation Enabled', b.x + 35, 540);
+      });
+
+      ctx.restore();
+    }
+
+    // SCENE 6: Macro-Mentorship & Career Progression
+    function drawScene6_MacroMentorship(t) {
+      ctx.save();
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 20px -apple-system, sans-serif';
+      ctx.fillText('THE MACRO LOOP', 80, 110);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 38px -apple-system, sans-serif';
+      ctx.fillText('From Daily Drills to Career Mastery', 80, 160);
+
+      // Roadmap Graph
+      const nodes = [
+        { title: 'RDD: Design Foundations', status: 'COMPLETED (100%)', color: '#22c55e', x: 120, y: 280 },
+        { title: 'GoF Design Patterns', status: 'PROPOSED NEXT STEP', color: '#38bdf8', x: 480, y: 280 },
+        { title: 'Refactoring to Patterns', status: 'FUTURE MILESTONE', color: '#a855f7', x: 840, y: 280 }
+      ];
+
+      // Connecting Arrows
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(380, 340); ctx.lineTo(480, 340);
+      ctx.moveTo(740, 340); ctx.lineTo(840, 340);
+      ctx.stroke();
+
+      nodes.forEach(n => {
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = n.color;
+        ctx.lineWidth = 2;
+        roundRect(ctx, n.x, n.y, 260, 130, 12, true, true);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 16px -apple-system, sans-serif';
+        ctx.fillText(n.title, n.x + 20, n.y + 45);
+
+        ctx.fillStyle = n.color;
+        ctx.font = '700 13px -apple-system, sans-serif';
+        ctx.fillText(n.status, n.x + 20, n.y + 80);
+      });
+
+      // Bottom Callout
+      const bx = 120, by = 470, bw = 980, bh = 140;
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1;
+      roundRect(ctx, bx, by, bw, bh, 12, true, true);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 20px -apple-system, sans-serif';
+      ctx.fillText('🤝 AI Proposes, The Human Always Leads', bx + 40, by + 45);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '400 16px -apple-system, sans-serif';
+      ctx.fillText('The assistant analyzes prerequisites on your mastery graph and recommends foundational steps.', bx + 40, by + 80);
+      ctx.fillText('You steer your own trajectory. Zero shortcuts. Real compounding knowledge.', bx + 40, by + 105);
+
+      ctx.restore();
+    }
+
+    // Helper: Rounded Rectangle
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+      } else if (Array.isArray(radius)) {
+        radius = {tl: radius[0], tr: radius[1], br: radius[2], bl: radius[3]};
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    // Animation Loop
+    function loop() {
+      if (isPlaying) {
+        currentTime = audio.currentTime;
+      }
+      render(currentTime);
+      requestAnimationFrame(loop);
+    }
+
+    // Initial render
+    render(0);
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
