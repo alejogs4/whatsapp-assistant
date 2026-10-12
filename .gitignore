@@ -1,0 +1,5 @@
+# Local documentation & artifacts
+docs/local/
+
+# OS metadata
+.DS_Store
