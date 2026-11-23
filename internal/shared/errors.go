@@ -8,6 +8,8 @@ var (
 	ErrSessionExpired                = errors.New("touchpoint session has expired; silent backoff enforced")
 	ErrUserNotFound                  = errors.New("user not found")
 	ErrLearningPathNotFound          = errors.New("learning path not found")
+	ErrMasteryLedgerNotFound         = errors.New("mastery ledger entry not found")
+	ErrTouchpointSessionNotFound     = errors.New("touchpoint session not found")
 	ErrInvalidMasteryScore           = errors.New("mastery score must be between 0.0 and 1.0")
 	ErrInvalidTimezone               = errors.New("invalid or unparseable IANA timezone identifier")
 )

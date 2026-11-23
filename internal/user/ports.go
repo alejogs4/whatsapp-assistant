@@ -9,5 +9,7 @@ import (
 
 type UserRepository interface {
 	FindByID(ctx context.Context, id shared.UserID) (*domain.User, error)
+	FindByPhoneNumber(ctx context.Context, phoneNumber string) (*domain.User, error)
+	FindAll(ctx context.Context) ([]*domain.User, error)
 	Save(ctx context.Context, user *domain.User) error
 }

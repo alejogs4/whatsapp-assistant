@@ -1,14 +1,15 @@
 version: 1
 change_id: issue-2-storage-vectors
+
 tasks:
   - id: t1-port-extensions
     title: Extend domain repository and embedding port contracts for multi-tenant storage
-    status: pending
+    status: done
     depends_on: []
     topics:
       - domain-core
       - storage-vectors
-    spec: specs/t1-port-extensions.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t1-port-extensions.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -16,11 +17,11 @@ tasks:
 
   - id: t2-sqlite-schema
     title: Implement SQLite connection bootstrap and idempotent multi-tenant schema migrations
-    status: pending
+    status: done
     depends_on: []
     topics:
       - storage-vectors
-    spec: specs/t2-sqlite-schema.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t2-sqlite-schema.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -28,14 +29,12 @@ tasks:
 
   - id: t3-user-repo
     title: Implement SQLite UserRepository with phone lookup and circadian budget persistence
-    status: pending
-    depends_on:
-      - t1-port-extensions
-      - t2-sqlite-schema
+    status: done
+    depends_on: [t1-port-extensions, t2-sqlite-schema]
     topics:
       - storage-vectors
       - domain-core
-    spec: specs/t3-user-repo.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t3-user-repo.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -43,14 +42,12 @@ tasks:
 
   - id: t4-learning-repos
     title: Implement SQLite LearningPathRepository and MasteryLedgerRepository with user_id isolation
-    status: pending
-    depends_on:
-      - t1-port-extensions
-      - t2-sqlite-schema
+    status: done
+    depends_on: [t1-port-extensions, t2-sqlite-schema]
     topics:
       - storage-vectors
       - domain-core
-    spec: specs/t4-learning-repos.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t4-learning-repos.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -58,14 +55,12 @@ tasks:
 
   - id: t5-touchpoint-repo
     title: Implement SQLite TouchpointRepository with active session and daily audit queries
-    status: pending
-    depends_on:
-      - t1-port-extensions
-      - t2-sqlite-schema
+    status: done
+    depends_on: [t1-port-extensions, t2-sqlite-schema]
     topics:
       - storage-vectors
       - domain-core
-    spec: specs/t5-touchpoint-repo.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t5-touchpoint-repo.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -73,14 +68,12 @@ tasks:
 
   - id: t6-vector-corpus
     title: Implement embedded SQLite vector store and local cosine k-NN SourceCorpusPort
-    status: pending
-    depends_on:
-      - t1-port-extensions
-      - t2-sqlite-schema
+    status: done
+    depends_on: [t1-port-extensions, t2-sqlite-schema]
     topics:
       - storage-vectors
       - domain-core
-    spec: specs/t6-vector-corpus.feature
+    spec: .harness/work/issue-2-storage-vectors/specs/t6-vector-corpus.feature
     verify_mode: bdd
     checks:
       - go-vet

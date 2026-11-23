@@ -27,7 +27,12 @@ type MasteryLedgerRepository interface {
 	Save(ctx context.Context, ledger *domain.MasteryLedger) error
 }
 
+type EmbeddingPort interface {
+	EmbedChunks(ctx context.Context, chunks []string) ([][]float32, error)
+}
+
 type SourceCorpusPort interface {
+	StoreChunks(ctx context.Context, userID shared.UserID, pathID shared.PathID, chunks []string) error
 	RetrieveChunks(ctx context.Context, userID shared.UserID, pathID shared.PathID, query string, limit int) ([]GroundedChunk, error)
 	IngestPathCorpus(ctx context.Context, userID shared.UserID, pathID shared.PathID, folderID string) error
 }

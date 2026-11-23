@@ -9,14 +9,26 @@ import (
 )
 
 type TouchpointRepository interface {
-	FindByID(ctx context.Context, id shared.SessionID) (*domain.TouchpointSession, error)
+	FindByID(ctx context.Context, userID shared.UserID, id shared.SessionID) (*domain.TouchpointSession, error)
 	FindActiveSession(ctx context.Context, userID shared.UserID) (*domain.TouchpointSession, error)
+	FindByUserAndDate(ctx context.Context, userID shared.UserID, dayStart, dayEnd time.Time) ([]*domain.TouchpointSession, error)
 	Save(ctx context.Context, session *domain.TouchpointSession) error
 }
 
 type MessagingPort interface {
 	SendText(ctx context.Context, recipientPhoneNumber string, body string) error
 	SendDrillPrompt(ctx context.Context, recipientPhoneNumber string, prompt string) error
+}
+
+type InboundMessage struct {
+	MessageID   string
+	SenderPhone string
+	Text        string
+	ReceivedAt  time.Time
+}
+
+type InboundMessageHandler interface {
+	HandleInbound(ctx context.Context, msg InboundMessage) error
 }
 
 type DrillRequest struct {
