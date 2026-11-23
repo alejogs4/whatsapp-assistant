@@ -1,9 +1,10 @@
 version: 1
 change_id: issue-5-scheduler-arbitrator
+
 tasks:
   - id: t1-attention-arbitrator
     title: Implement AttentionArbitrator for deterministic The ONE Thing selection and telemetry fallback
-    status: pending
+    status: done
     depends_on: []
     topics:
       - scheduler-arbitrator
@@ -16,7 +17,7 @@ tasks:
 
   - id: t2-drill-coordinator
     title: Implement DrillCoordinator orchestrating corpus retrieval, LLM drill generation, session creation, and dispatch
-    status: pending
+    status: done
     depends_on: []
     topics:
       - scheduler-arbitrator
@@ -29,7 +30,7 @@ tasks:
 
   - id: t3-pedagogical-evaluator
     title: Implement PedagogicalEvaluator for UC-2 inbound drill grading and MasteryLedger updates
-    status: pending
+    status: done
     depends_on: []
     topics:
       - scheduler-arbitrator
@@ -42,10 +43,8 @@ tasks:
 
   - id: t4-proactive-scheduler
     title: Implement timezone-aware 2-touch Scheduler with idempotency and zero-nag silent backoff
-    status: pending
-    depends_on:
-      - t1-attention-arbitrator
-      - t2-drill-coordinator
+    status: done
+    depends_on: [t1-attention-arbitrator, t2-drill-coordinator]
     topics:
       - scheduler-arbitrator
       - domain-core
@@ -57,10 +56,8 @@ tasks:
 
   - id: t5-daemon-wiring
     title: Implement cmd/daemon composition root wiring adapters, scheduler, and graceful shutdown
-    status: pending
-    depends_on:
-      - t3-pedagogical-evaluator
-      - t4-proactive-scheduler
+    status: done
+    depends_on: [t3-pedagogical-evaluator, t4-proactive-scheduler]
     topics:
       - scheduler-arbitrator
       - storage-vectors
