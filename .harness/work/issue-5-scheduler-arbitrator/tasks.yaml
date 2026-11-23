@@ -8,7 +8,7 @@ tasks:
     topics:
       - scheduler-arbitrator
       - domain-core
-    spec: specs/t1-attention-arbitrator.feature
+    spec: .harness/work/issue-5-scheduler-arbitrator/specs/t1-attention-arbitrator.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -21,7 +21,7 @@ tasks:
     topics:
       - scheduler-arbitrator
       - domain-core
-    spec: specs/t2-drill-coordinator.feature
+    spec: .harness/work/issue-5-scheduler-arbitrator/specs/t2-drill-coordinator.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -34,7 +34,7 @@ tasks:
     topics:
       - scheduler-arbitrator
       - domain-core
-    spec: specs/t3-pedagogical-evaluator.feature
+    spec: .harness/work/issue-5-scheduler-arbitrator/specs/t3-pedagogical-evaluator.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -49,7 +49,7 @@ tasks:
     topics:
       - scheduler-arbitrator
       - domain-core
-    spec: specs/t4-proactive-scheduler.feature
+    spec: .harness/work/issue-5-scheduler-arbitrator/specs/t4-proactive-scheduler.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -66,7 +66,7 @@ tasks:
       - storage-vectors
       - llm-adapter
       - whatsapp-transport
-    spec: specs/t5-daemon-wiring.feature
+    spec: .harness/work/issue-5-scheduler-arbitrator/specs/t5-daemon-wiring.feature
     verify_mode: bdd
     checks:
       - go-vet

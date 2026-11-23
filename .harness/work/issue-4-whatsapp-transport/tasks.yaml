@@ -1,14 +1,15 @@
 version: 1
 change_id: issue-4-whatsapp-transport
+
 tasks:
   - id: t1-jid-and-filter
     title: Add InboundMessage port, E.164/JID normalization, and 1:1 DM event filter
-    status: pending
+    status: done
     depends_on: []
     topics:
       - whatsapp-transport
       - domain-core
-    spec: specs/t1-jid-and-filter.feature
+    spec: .harness/work/issue-4-whatsapp-transport/specs/t1-jid-and-filter.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -16,13 +17,12 @@ tasks:
 
   - id: t2-outbound-messaging
     title: Implement MessagingPort SendText and SendDrillPrompt over mockable transport
-    status: pending
-    depends_on:
-      - t1-jid-and-filter
+    status: done
+    depends_on: [t1-jid-and-filter]
     topics:
       - whatsapp-transport
       - domain-core
-    spec: specs/t2-outbound-messaging.feature
+    spec: .harness/work/issue-4-whatsapp-transport/specs/t2-outbound-messaging.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -30,13 +30,12 @@ tasks:
 
   - id: t3-inbound-dispatcher
     title: Implement inbound WhatsApp event listener dispatching to InboundMessageHandler
-    status: pending
-    depends_on:
-      - t1-jid-and-filter
+    status: done
+    depends_on: [t1-jid-and-filter]
     topics:
       - whatsapp-transport
       - domain-core
-    spec: specs/t3-inbound-dispatcher.feature
+    spec: .harness/work/issue-4-whatsapp-transport/specs/t3-inbound-dispatcher.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -44,13 +43,11 @@ tasks:
 
   - id: t4-client-qr-lifecycle
     title: Implement whatsmeow client bootstrap, SQLite session store, QR pairing, and graceful shutdown
-    status: pending
-    depends_on:
-      - t2-outbound-messaging
-      - t3-inbound-dispatcher
+    status: done
+    depends_on: [t2-outbound-messaging, t3-inbound-dispatcher]
     topics:
       - whatsapp-transport
-    spec: specs/t4-client-qr-lifecycle.feature
+    spec: .harness/work/issue-4-whatsapp-transport/specs/t4-client-qr-lifecycle.feature
     verify_mode: bdd
     checks:
       - go-vet

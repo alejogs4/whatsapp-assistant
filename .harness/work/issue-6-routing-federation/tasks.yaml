@@ -9,7 +9,7 @@ tasks:
       - routing-federation
       - domain-core
       - llm-adapter
-    spec: specs/t1-routing-ports.feature
+    spec: .harness/work/issue-6-routing-federation/specs/t1-routing-ports.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -22,7 +22,7 @@ tasks:
     topics:
       - routing-federation
       - domain-core
-    spec: specs/t2-command-controller.feature
+    spec: .harness/work/issue-6-routing-federation/specs/t2-command-controller.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -36,7 +36,7 @@ tasks:
     topics:
       - routing-federation
       - domain-core
-    spec: specs/t3-scatter-gather.feature
+    spec: .harness/work/issue-6-routing-federation/specs/t3-scatter-gather.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -50,7 +50,7 @@ tasks:
     topics:
       - routing-federation
       - domain-core
-    spec: specs/t4-macro-coach.feature
+    spec: .harness/work/issue-6-routing-federation/specs/t4-macro-coach.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -67,7 +67,7 @@ tasks:
       - routing-federation
       - scheduler-arbitrator
       - domain-core
-    spec: specs/t5-hierarchical-router.feature
+    spec: .harness/work/issue-6-routing-federation/specs/t5-hierarchical-router.feature
     verify_mode: bdd
     checks:
       - go-vet
