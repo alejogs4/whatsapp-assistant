@@ -1,14 +1,15 @@
 version: 1
 change_id: issue-3-llm-adapter
+
 tasks:
   - id: t1-validation-guards
     title: Implement grounded prompt builders and deterministic output validators
-    status: pending
+    status: done
     depends_on: []
     topics:
       - llm-adapter
       - domain-core
-    spec: specs/t1-validation-guards.feature
+    spec: .harness/work/issue-3-llm-adapter/specs/t1-validation-guards.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -16,11 +17,11 @@ tasks:
 
   - id: t2-gemini-client
     title: Implement Gemini SDK config and mockable internal transport wrapper
-    status: pending
+    status: done
     depends_on: []
     topics:
       - llm-adapter
-    spec: specs/t2-gemini-client.feature
+    spec: .harness/work/issue-3-llm-adapter/specs/t2-gemini-client.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -28,13 +29,12 @@ tasks:
 
   - id: t3-embed-chunks
     title: Implement EmbeddingPort.EmbedChunks with batching and order preservation
-    status: pending
-    depends_on:
-      - t2-gemini-client
+    status: done
+    depends_on: [t2-gemini-client]
     topics:
       - llm-adapter
       - domain-core
-    spec: specs/t3-embed-chunks.feature
+    spec: .harness/work/issue-3-llm-adapter/specs/t3-embed-chunks.feature
     verify_mode: bdd
     checks:
       - go-vet
@@ -42,14 +42,12 @@ tasks:
 
   - id: t4-drill-and-eval
     title: Implement LLMPort GenerateMicroDrill and EvaluateAnswer with bounded validation retries
-    status: pending
-    depends_on:
-      - t1-validation-guards
-      - t2-gemini-client
+    status: done
+    depends_on: [t1-validation-guards, t2-gemini-client]
     topics:
       - llm-adapter
       - domain-core
-    spec: specs/t4-drill-and-eval.feature
+    spec: .harness/work/issue-3-llm-adapter/specs/t4-drill-and-eval.feature
     verify_mode: bdd
     checks:
       - go-vet
