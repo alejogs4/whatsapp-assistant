@@ -17,5 +17,8 @@ Native WhatsApp Web multi-device transport adapter (`internal/adapters/whatsapp/
 5. **Graceful Lifecycle**: Respect `context.Context` cancellation for clean disconnect on `SIGINT`/`SIGTERM`, with bounded reconnect backoff.
 
 ## Gotchas & Constraints
-- Never require a live WhatsApp account for Tier 1 `go test -race ./...`; wrap the `whatsmeow.Client` behind a minimal internal transport interface so unit tests verify message normalization, self/group filtering, JID formatting, and outbound dispatch deterministically.
-- `SendDrillPrompt` formats micro-drills cleanly for mobile WhatsApp readability (concise, plain/WhatsApp markdown, no raw JSON).
+- Never require a live WhatsApp account for Tier 1 `go test -race ./...`; `Sender` wraps `MessageSender` and `Client` wraps `LifecycleClient` for deterministic offline testing.
+- **Race-safe QR shutdown**: `Client.Start(ctx)` waits on a `qrDone` channel after `Disconnect()` so the QR reader goroutine drains cleanly before `Start` returns (caught and verified by `-race`).
+- `sqlstore.New` uses driver `"sqlite"` (`modernc.org/sqlite`) with `_pragma=foreign_keys(1)` appended when absent.
+- `SendDrillPrompt` formats micro-drills cleanly for mobile WhatsApp readability (`*Quick Drill*` header, plain text).
+- Status: **Implemented & verified** (`internal/adapters/whatsapp/`, commit `9ec762a`).

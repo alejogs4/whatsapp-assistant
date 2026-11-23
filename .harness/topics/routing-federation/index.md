@@ -20,5 +20,7 @@ Hierarchical inbound message router (`internal/touchpoint/services/router.go`), 
 4. **Concurrency Safety**: Scatter-Gather fan-out must be race-free (`go test -race`), respect `ctx` timeouts, and degrade gracefully if one path returns zero chunks.
 
 ## Gotchas & Constraints
-- Unbound general queries (0 matching paths, non-command, non-curriculum) route to a lightweight general assistant fallback without mutating any path state.
-- Keep LLM classification/synthesis behind narrow port interfaces so the entire routing tree and scatter-gather concurrency are deterministically unit-tested with fakes.
+- Operational slash commands (`/pause`, `/resume`, `/skip`, `/stats`, `/schedule`) execute at Stage 1 before the Drill State Guard so users can always escape/skip an active drill without corrupting `MasteryLedger`.
+- Unbound general queries (0 matching paths, non-command, non-curriculum) route to `SynthesisPort.AnswerGeneral` without mutating any path state.
+- `CrossPathSynthesizer` tolerates partial empty retrieval (gracefully skipping paths with 0 chunks) and never calls `MasteryLedgerRepository.Save`.
+- Status: **Implemented & verified** (`internal/touchpoint/services/{commands,scatter_gather,macro_coach,router}.go`, commit `4cde163`).

@@ -22,5 +22,8 @@ Provider-decoupled AI intelligence adapter (`internal/adapters/llm/gemini/`) imp
 4. **Offline Deterministic Tests**: Unit and contract tests run without live API keys using injected HTTP/client transport mocks and recorded fixtures.
 
 ## Gotchas & Constraints
-- Batch `EmbedChunks` calls to respect Gemini embedding batch limits and preserve strict input-to-output ordering (`len(embeddings) == len(chunks)`).
+- Uses official `google.golang.org/genai` wrapped behind a package-internal `Transport` interface (`GenerateJSON`, `EmbedBatch`) so all unit/contract tests execute offline without live API keys.
+- `Adapter` implements `touchpoint.LLMPort`, `learning.EmbeddingPort`, `touchpoint.PathAffinityPort`, and `touchpoint.SynthesisPort`.
+- Batch `EmbedChunks` calls respect `Config.EmbedBatchSize` (default 100) and preserve strict 1:1 input-to-output ordering.
 - Never log raw API keys or user private corpus text at info level.
+- Status: **Implemented & verified** (`internal/adapters/llm/gemini/`, commits `0a43285`, `4cde163`).

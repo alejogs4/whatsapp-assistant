@@ -27,5 +27,7 @@ SQLite persistence adapter (`internal/adapters/storage/sqlite/`) providing stric
 - `learning_path_chunks`: `id`, `user_id`, `path_id`, `content`, `embedding_blob`, `source_ref`, `created_at`.
 
 ## Gotchas & Constraints
-- `SourceCorpusPort.RetrieveChunks` accepts `query string`; the SQLite adapter should depend on a narrow `Embedder` interface (`EmbedChunks(ctx, []string) ([][]float32, error)`) injected at construction so it stays decoupled from Gemini.
+- **Driver**: Uses pure-Go `modernc.org/sqlite` (`database/sql` driver `"sqlite"`). For `:memory:` DSNs, `Open()` enforces `SetMaxOpenConns(1)` so all queries share the single in-memory database; file-backed DBs enable `PRAGMA journal_mode = WAL;`.
+- `SourceCorpusPort.RetrieveChunks` accepts `query string`; `CorpusStore` injects `learning.EmbeddingPort` and optional `FolderFetcher` so storage stays decoupled from Gemini and Google Drive.
 - Always parse/store timestamps in RFC3339Nano UTC to avoid timezone drift across `User.Timezone` calculations.
+- Status: **Implemented & verified** (`internal/adapters/storage/sqlite/`, commit `d425134`).

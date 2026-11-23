@@ -27,7 +27,11 @@ Pure Go business invariants, aggregates, and hexagonal port contracts following 
 4. **Proactivity Budget & Zero-Nag**: Max 2 proactive touches/day; unanswered sessions expire silently with zero follow-up nudges.
 5. **Bounded Context Isolation**: Retrieving context from multiple `LearningPath`s must never cross-contaminate `MasteryLedger` state.
 
-## Known Port Extensions Needed by Upcoming Issues
-- **Issue #2 / #4 / #5**: Extend `UserRepository` (`FindByPhoneNumber`, `FindAll`), scope `TouchpointRepository.FindByID` by `userID`, add `FindByUserAndDate` for daily audit/streak checks.
-- **Issue #2 / #3**: Introduce an `EmbeddingPort` (or `EmbedChunks` on `LLMPort`) so vector ingestion/retrieval is decoupled from Gemini.
-- **Issue #6**: Extend `LLMPort` (or dedicated synthesis/classification ports) for Path Affinity Classification, Cross-Path Synthesis, and Macro-Loop Milestone Synthesis.
+## Implemented Port Extensions (Issues #2–#6)
+- `internal/user/ports.go`: `UserRepository` (`FindByID`, `FindByPhoneNumber`, `FindAll`, `Save`).
+- `internal/learning/ports.go`: `EmbeddingPort` (`EmbedChunks`), `SourceCorpusPort` (`StoreChunks`, `RetrieveChunks`, `IngestPathCorpus`), `LearningPathRepository`, `MasteryLedgerRepository`.
+- `internal/touchpoint/ports.go`:
+  - `TouchpointRepository` (`FindByID(ctx, userID, id)`, `FindActiveSession`, `FindByUserAndDate`, `Save`).
+  - `InboundMessage` + `InboundMessageHandler` (driving port decoupling `whatsmeow` from `InboundRouter`).
+  - `PathAffinityPort` (`ClassifyPathAffinity`) and `SynthesisPort` (`AnswerGrounded`, `SynthesizeCrossPath`, `SynthesizeMilestone`, `AnswerGeneral`).
+- `internal/shared/errors.go`: Added `ErrMasteryLedgerNotFound` and `ErrTouchpointSessionNotFound`.

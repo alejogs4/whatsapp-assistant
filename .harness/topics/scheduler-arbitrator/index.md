@@ -21,5 +21,6 @@ Proactive background scheduler (`cmd/daemon` / `internal/touchpoint/services/`) 
 4. **Calendar Telemetry Fallback**: If `CalendarTelemetryPort` is unavailable or unconfigured in MVP, degrade gracefully to circadian baseline defaults (High in morning, Low in evening) without crashing.
 
 ## Gotchas & Constraints
-- Idempotency: A scheduler tick firing twice within the same morning/evening hour must NOT send duplicate touchpoints (guard via today's existing touchpoint sessions + `DailyTouchesUsed`).
-- `cmd/daemon` wires config, SQLite, Gemini, WhatsApp, Calendar stub/adapter, and Scheduler with clean shutdown.
+- Idempotency: `Scheduler.RunTick` queries `FindByUserAndDate` for the user's local calendar day so repeat ticks within the same morning/evening hour never send duplicate touchpoints.
+- `cmd/daemon` wires config (`LoadConfigFromEnv`), SQLite, Gemini, WhatsApp, `InboundRouter`, and `Scheduler` with `signal.NotifyContext` graceful shutdown.
+- Status: **Implemented & verified** (`internal/touchpoint/services/`, `cmd/daemon/`, commit `fd3f098`).
