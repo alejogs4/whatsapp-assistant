@@ -1,0 +1,18 @@
+version: 1
+
+# Tier 1 deterministic checks executed by `harness check`
+checks:
+  - name: go-vet
+    cmd: go vet ./...
+    required: true
+
+  - name: go-test
+    cmd: go test -race ./...
+    required: true
+
+# Sandboxed environment lifecycle managed deterministically by `harness sandbox`
+# sandbox:
+#   up: docker compose -f docker-compose.sandbox.yml up -d
+#   healthcheck: curl -sf http://localhost:18080/health
+#   healthcheck_timeout: 30s
+#   down: docker compose -f docker-compose.sandbox.yml down -v

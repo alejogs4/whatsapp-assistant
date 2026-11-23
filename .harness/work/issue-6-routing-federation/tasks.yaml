@@ -1,0 +1,74 @@
+version: 1
+change_id: issue-6-routing-federation
+tasks:
+  - id: t1-routing-ports
+    title: Define segregated PathAffinityPort and SynthesisPort interfaces and Gemini adapter methods
+    status: pending
+    depends_on: []
+    topics:
+      - routing-federation
+      - domain-core
+      - llm-adapter
+    spec: specs/t1-routing-ports.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t2-command-controller
+    title: Implement deterministic Operational Command Controller (/pause, /resume, /skip, /stats, /schedule)
+    status: pending
+    depends_on: []
+    topics:
+      - routing-federation
+      - domain-core
+    spec: specs/t2-command-controller.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t3-scatter-gather
+    title: Implement concurrent Scatter-Gather CrossPathSynthesizer with Bounded Context isolation
+    status: pending
+    depends_on:
+      - t1-routing-ports
+    topics:
+      - routing-federation
+      - domain-core
+    spec: specs/t3-scatter-gather.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t4-macro-coach
+    title: Implement MacroCoach for UC-4 milestone threshold detection and prerequisite roadmap synthesis
+    status: pending
+    depends_on:
+      - t1-routing-ports
+    topics:
+      - routing-federation
+      - domain-core
+    spec: specs/t4-macro-coach.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t5-hierarchical-router
+    title: Implement InboundRouter unifying Drill Guard, Commands, Path Affinity, Scatter-Gather, and MacroCoach
+    status: pending
+    depends_on:
+      - t2-command-controller
+      - t3-scatter-gather
+      - t4-macro-coach
+    topics:
+      - routing-federation
+      - scheduler-arbitrator
+      - domain-core
+    spec: specs/t5-hierarchical-router.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test

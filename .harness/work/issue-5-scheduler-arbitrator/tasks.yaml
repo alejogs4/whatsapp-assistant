@@ -1,0 +1,73 @@
+version: 1
+change_id: issue-5-scheduler-arbitrator
+tasks:
+  - id: t1-attention-arbitrator
+    title: Implement AttentionArbitrator for deterministic The ONE Thing selection and telemetry fallback
+    status: pending
+    depends_on: []
+    topics:
+      - scheduler-arbitrator
+      - domain-core
+    spec: specs/t1-attention-arbitrator.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t2-drill-coordinator
+    title: Implement DrillCoordinator orchestrating corpus retrieval, LLM drill generation, session creation, and dispatch
+    status: pending
+    depends_on: []
+    topics:
+      - scheduler-arbitrator
+      - domain-core
+    spec: specs/t2-drill-coordinator.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t3-pedagogical-evaluator
+    title: Implement PedagogicalEvaluator for UC-2 inbound drill grading and MasteryLedger updates
+    status: pending
+    depends_on: []
+    topics:
+      - scheduler-arbitrator
+      - domain-core
+    spec: specs/t3-pedagogical-evaluator.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t4-proactive-scheduler
+    title: Implement timezone-aware 2-touch Scheduler with idempotency and zero-nag silent backoff
+    status: pending
+    depends_on:
+      - t1-attention-arbitrator
+      - t2-drill-coordinator
+    topics:
+      - scheduler-arbitrator
+      - domain-core
+    spec: specs/t4-proactive-scheduler.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
+
+  - id: t5-daemon-wiring
+    title: Implement cmd/daemon composition root wiring adapters, scheduler, and graceful shutdown
+    status: pending
+    depends_on:
+      - t3-pedagogical-evaluator
+      - t4-proactive-scheduler
+    topics:
+      - scheduler-arbitrator
+      - storage-vectors
+      - llm-adapter
+      - whatsapp-transport
+    spec: specs/t5-daemon-wiring.feature
+    verify_mode: bdd
+    checks:
+      - go-vet
+      - go-test
