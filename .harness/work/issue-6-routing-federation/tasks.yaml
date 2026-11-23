@@ -1,9 +1,10 @@
 version: 1
 change_id: issue-6-routing-federation
+
 tasks:
   - id: t1-routing-ports
     title: Define segregated PathAffinityPort and SynthesisPort interfaces and Gemini adapter methods
-    status: pending
+    status: done
     depends_on: []
     topics:
       - routing-federation
@@ -17,7 +18,7 @@ tasks:
 
   - id: t2-command-controller
     title: Implement deterministic Operational Command Controller (/pause, /resume, /skip, /stats, /schedule)
-    status: pending
+    status: done
     depends_on: []
     topics:
       - routing-federation
@@ -30,9 +31,8 @@ tasks:
 
   - id: t3-scatter-gather
     title: Implement concurrent Scatter-Gather CrossPathSynthesizer with Bounded Context isolation
-    status: pending
-    depends_on:
-      - t1-routing-ports
+    status: done
+    depends_on: [t1-routing-ports]
     topics:
       - routing-federation
       - domain-core
@@ -44,9 +44,8 @@ tasks:
 
   - id: t4-macro-coach
     title: Implement MacroCoach for UC-4 milestone threshold detection and prerequisite roadmap synthesis
-    status: pending
-    depends_on:
-      - t1-routing-ports
+    status: done
+    depends_on: [t1-routing-ports]
     topics:
       - routing-federation
       - domain-core
@@ -58,11 +57,8 @@ tasks:
 
   - id: t5-hierarchical-router
     title: Implement InboundRouter unifying Drill Guard, Commands, Path Affinity, Scatter-Gather, and MacroCoach
-    status: pending
-    depends_on:
-      - t2-command-controller
-      - t3-scatter-gather
-      - t4-macro-coach
+    status: done
+    depends_on: [t2-command-controller, t3-scatter-gather, t4-macro-coach]
     topics:
       - routing-federation
       - scheduler-arbitrator

@@ -70,3 +70,50 @@ const (
 type CalendarTelemetryPort interface {
 	GetCognitiveBandwidth(ctx context.Context, userID shared.UserID, date time.Time) (CognitiveBandwidth, error)
 }
+
+type IntentKind string
+
+const (
+	IntentPathBound  IntentKind = "PATH_BOUND"
+	IntentCurriculum IntentKind = "CURRICULUM"
+	IntentGeneral    IntentKind = "GENERAL"
+)
+
+type PathSummary struct {
+	ID    shared.PathID
+	Title string
+}
+
+type AffinityResult struct {
+	MatchedPaths []shared.PathID
+	Intent       IntentKind
+}
+
+type PathAffinityPort interface {
+	ClassifyPathAffinity(ctx context.Context, message string, activePaths []PathSummary) (*AffinityResult, error)
+}
+
+type PathCorpusContext struct {
+	PathID    shared.PathID
+	PathTitle string
+	Chunks    []string
+}
+
+type MilestoneRequest struct {
+	UserID            shared.UserID
+	CompletedPathName string
+	ActivePathNames   []string
+	UserQuestion      string
+}
+
+type MilestoneRecommendation struct {
+	ProposedPath string
+	Reasoning    string
+}
+
+type SynthesisPort interface {
+	AnswerGrounded(ctx context.Context, question string, pathCtx PathCorpusContext) (string, error)
+	SynthesizeCrossPath(ctx context.Context, question string, contexts []PathCorpusContext) (string, error)
+	SynthesizeMilestone(ctx context.Context, req MilestoneRequest) (*MilestoneRecommendation, error)
+	AnswerGeneral(ctx context.Context, question string) (string, error)
+}

@@ -85,19 +85,40 @@ func boot(ctx context.Context, cfg Config, logger *slog.Logger) error {
 	sessionRepo := sqlite.NewTouchpointRepo(db)
 	corpusStore := sqlite.NewCorpusStore(db, llmAdapter, nil)
 
-	var inboundHandler touchpoint.InboundMessageHandler
+	var routerRef touchpoint.InboundMessageHandler
+	lazyHandler := inboundHandlerFunc(func(ctx context.Context, msg touchpoint.InboundMessage) error {
+		if routerRef == nil {
+			return nil
+		}
+		return routerRef.HandleInbound(ctx, msg)
+	})
+
 	waClient, err := whatsapp.NewClient(ctx, whatsapp.Config{
 		SessionDBPath: cfg.WhatsAppSessionDB,
 		Logger:        logger,
-	}, inboundHandler)
+	}, lazyHandler)
 	if err != nil {
 		return fmt.Errorf("init whatsapp client: %w", err)
 	}
 
 	arbitrator := services.NewAttentionArbitrator(pathRepo, ledgerRepo, nil)
 	coordinator := services.NewDrillCoordinator(userRepo, corpusStore, sessionRepo, llmAdapter, waClient, arbitrator)
+	evaluator := services.NewPedagogicalEvaluator(corpusStore, ledgerRepo, sessionRepo, llmAdapter, waClient)
+	commands := services.NewCommandController(userRepo, pathRepo, sessionRepo, waClient)
+	scatterGather := services.NewCrossPathSynthesizer(corpusStore, llmAdapter, services.DefaultCorpusLimit)
+	macroCoach := services.NewMacroCoach(pathRepo, ledgerRepo, llmAdapter, services.DefaultMasteryThreshold)
+	routerRef = services.NewInboundRouter(
+		userRepo, pathRepo, corpusStore, sessionRepo, waClient,
+		llmAdapter, llmAdapter, commands, evaluator, scatterGather, macroCoach, services.RealClock{},
+	)
 	scheduler := services.NewScheduler(userRepo, sessionRepo, coordinator, waClient, services.RealClock{}, cfg.TickInterval, logger)
 
 	logger.Info("whatsapp adaptive learning daemon started")
 	return runDaemon(ctx, scheduler, waClient)
+}
+
+type inboundHandlerFunc func(ctx context.Context, msg touchpoint.InboundMessage) error
+
+func (f inboundHandlerFunc) HandleInbound(ctx context.Context, msg touchpoint.InboundMessage) error {
+	return f(ctx, msg)
 }
